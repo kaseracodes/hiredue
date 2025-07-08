@@ -3,7 +3,10 @@ const fs = require('fs');
 const Database = require('better-sqlite3');
 const { app } = require('electron');
 
+const log = require('./utils/logger.cjs');
+
 const dbDir = path.join(app.getPath('userData'), 'db');
+log.info("Database Directory: ", dbDir);
 if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir);
 
 const dbPath = path.join(dbDir, 'app.db');

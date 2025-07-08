@@ -1,6 +1,8 @@
 const { app, BrowserWindow, ipcMain, Tray, Menu } = require('electron');
 const path = require('path');
 
+const log = require('./utils/logger.cjs');
+
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
@@ -15,8 +17,8 @@ const isDev = !app.isPackaged;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 400,
-    height: 300,
+    width: 500,
+    height: 500,
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
@@ -28,7 +30,7 @@ function createWindow() {
     mainWindow.loadURL('http://localhost:5173');
   } else {
     const indexPath = path.join(app.getAppPath(), 'dist', 'index.html');
-    console.log('Trying to load:', indexPath);
+    log.debug('Trying to load:', indexPath);
     mainWindow.loadFile(indexPath);
   }
 
@@ -50,11 +52,13 @@ app.whenReady().then(() => {
     { label: 'Quit', click: () => app.quit() }
   ]));
 
+  log.info('Electron app booting...');
+
   setInterval(() => {
     const current = db.prepare('SELECT value FROM counters WHERE id = 1').get()?.value || 0;
     const newValue = current + 1;
     db.prepare('INSERT OR REPLACE INTO counters (id, value) VALUES (1, ?)').run(newValue);
-    console.log('Counter electron/main.cjs:', newValue);
+    log.info('Counter:', newValue);
   }, 4000);
 });
 
@@ -75,8 +79,28 @@ ipcMain.handle('get-counter', async () => {
 });
 
 ipcMain.handle('increment-counter', () => {
+  log.debug('Increament query executed successfully');
   const current = db.prepare('SELECT value FROM counters WHERE id = 1').get()?.value || 0;
   const newValue = current + 1;
   db.prepare('INSERT OR REPLACE INTO counters (id, value) VALUES (1, ?)').run(newValue);
   return newValue;
+});
+
+ipcMain.on('log', (event, level, message) => {
+  switch (level) {
+    case 'info':
+      log.raw.info(message);
+      break;
+    case 'warn':
+      log.raw.warn(message);
+      break;
+    case 'error':
+      log.raw.error(message);
+      break;
+    case 'debug':
+      log.raw.debug(message);
+      break;
+    default:
+      log.raw.info(message);
+  }
 });
