@@ -13,6 +13,7 @@ function App() {
   }, []);
 
   const handleClick = async () => {
+    window.logger.info('Button Clicked');
     const updated = await window.electronAPI.incrementCounter();
     setCount(updated);
   };
