@@ -4,13 +4,21 @@ function App() {
   const [count, setCount] = useState(0);
   const [tasks, setTasks] = useState([]);
 
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      const newCount = await window.electronAPI.getCounter();
-      setCount(newCount);
-    }, 1000);
+  // useEffect(() => {
+  //   const interval = setInterval(async () => {
+  //     const newCount = await window.electronAPI.getCounter();
+  //     setCount(newCount);
+  //   }, 1000);
 
-    return () => clearInterval(interval);
+  //   return () => clearInterval(interval);
+  // }, []);
+
+  useEffect(() => {
+    const initalCount = window.electronAPI.getCounter();
+    setCount(initalCount);
+    const update = (value) => setCount(value);
+    window.events.onCounterUpdate(update);
+    return () => window.events.removeCounterUpdate(update);
   }, []);
 
   useEffect(() => {

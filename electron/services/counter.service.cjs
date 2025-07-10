@@ -13,6 +13,11 @@ function incrementCounter() {
     const newValue = current + 1;
     db.prepare('INSERT OR REPLACE INTO counters (id, value) VALUES (1, ?)').run(newValue);
     log.info("Current Counter Value:", newValue);
+
+    if (global.mainWindow) {
+        global.mainWindow.webContents.send('counter-updated', newValue);
+    }
+
     return newValue;
 }
 

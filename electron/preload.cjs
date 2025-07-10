@@ -17,3 +17,8 @@ contextBridge.exposeInMainWorld('taskAPI', {
     stop: (taskName) => ipcRenderer.invoke('task:stop', taskName),
     status: () => ipcRenderer.invoke('task:status')
 });
+
+contextBridge.exposeInMainWorld('events', {
+    onCounterUpdate: (cb) => ipcRenderer.on('counter-updated', (_, value) => cb(value)),
+    removeCounterUpdate: (cb) => ipcRenderer.removeListener('counter-updated', cb)
+});

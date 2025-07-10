@@ -26,17 +26,19 @@ function createWindow() {
         }
     });
 
+    global.mainWindow = mainWindow;
+
     if (isDev) {
-        mainWindow.loadURL('http://localhost:5173');
+        global.mainWindow.loadURL('http://localhost:5173');
     } else {
         const indexPath = path.join(app.getAppPath(), 'dist', 'index.html');
         log.info('Loading production file:', indexPath);
-        mainWindow.loadFile(indexPath);
+        global.mainWindow.loadFile(indexPath);
     }
 
-    mainWindow.on('close', (e) => {
+    global.mainWindow.on('close', (e) => {
         e.preventDefault();
-        mainWindow.hide();
+        global.mainWindow.hide();
     });
 }
 
@@ -47,7 +49,7 @@ app.whenReady().then(() => {
     tray = new Tray(path.join(__dirname, 'icon.png'));
     tray.setToolTip('HireDue');
     tray.setContextMenu(Menu.buildFromTemplate([
-        { label: 'Show GUI', click: () => mainWindow.show() },
+        { label: 'Show GUI', click: () => global.mainWindow.show() },
         { label: 'Quit', click: () => app.quit() }
     ]));
 
@@ -55,10 +57,10 @@ app.whenReady().then(() => {
 });
 
 app.on('second-instance', () => {
-    if (mainWindow) {
-        if (mainWindow.isMinimized()) mainWindow.restore();
-        mainWindow.show();
-        mainWindow.focus();
+    if (global.mainWindow) {
+        if (global.mainWindow.isMinimized()) global.mainWindow.restore();
+        global.mainWindow.show();
+        global.mainWindow.focus();
     } else {
         createWindow();
     }
