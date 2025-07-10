@@ -5,6 +5,8 @@ const log = require('./utils/logger.cjs');
 const { createIncreamentCounterJob } = require('./services/counter.service.cjs');
 const registerCounterIPC = require('./ipc/counter.ipc.cjs');
 const registerLoggerIPC = require('./ipc/logger.ipc.cjs');
+const { initScheduler } = require('./scheduler/index.cjs');
+require('./ipc/index.cjs'); 
 
 let tray = null;
 let mainWindow = null;
@@ -42,6 +44,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+    initScheduler();
     createWindow();
 
     tray = new Tray(path.join(__dirname, 'icon.png'));
@@ -56,7 +59,7 @@ app.whenReady().then(() => {
     registerCounterIPC();
     registerLoggerIPC();
 
-    createIncreamentCounterJob(); // Background counter update
+    // createIncreamentCounterJob(); // Background counter update
 });
 
 app.on('second-instance', () => {
