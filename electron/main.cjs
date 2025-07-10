@@ -2,7 +2,6 @@ const { app, BrowserWindow, Tray, Menu } = require('electron');
 const path = require('path');
 
 const log = require('./utils/logger.cjs');
-const { createIncreamentCounterJob } = require('./services/counter.service.cjs');
 const registerCounterIPC = require('./ipc/counter.ipc.cjs');
 const registerLoggerIPC = require('./ipc/logger.ipc.cjs');
 const { initScheduler } = require('./scheduler/index.cjs');
@@ -59,7 +58,6 @@ app.whenReady().then(() => {
     registerCounterIPC();
     registerLoggerIPC();
 
-    // createIncreamentCounterJob(); // Background counter update
 });
 
 app.on('second-instance', () => {
