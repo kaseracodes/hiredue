@@ -2,8 +2,6 @@ const { app, BrowserWindow, Tray, Menu } = require('electron');
 const path = require('path');
 
 const log = require('./utils/logger.cjs');
-const registerCounterIPC = require('./ipc/counter.ipc.cjs');
-const registerLoggerIPC = require('./ipc/logger.ipc.cjs');
 const { initScheduler } = require('./scheduler/index.cjs');
 require('./ipc/index.cjs'); 
 
@@ -54,10 +52,6 @@ app.whenReady().then(() => {
     ]));
 
     log.info('Electron app booting...');
-
-    registerCounterIPC();
-    registerLoggerIPC();
-
 });
 
 app.on('second-instance', () => {
