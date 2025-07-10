@@ -11,3 +11,14 @@ contextBridge.exposeInMainWorld('logger', {
     error: (msg) => ipcRenderer.send('log', 'error', msg),
     debug: (msg) => ipcRenderer.send('log', 'debug', msg)
 });
+
+contextBridge.exposeInMainWorld('taskAPI', {
+    start: (taskName) => ipcRenderer.invoke('task:start', taskName),
+    stop: (taskName) => ipcRenderer.invoke('task:stop', taskName),
+    status: () => ipcRenderer.invoke('task:status')
+});
+
+contextBridge.exposeInMainWorld('events', {
+    onCounterUpdate: (cb) => ipcRenderer.on('counter-updated', (_, value) => cb(value)),
+    removeCounterUpdate: (cb) => ipcRenderer.removeListener('counter-updated', cb)
+});

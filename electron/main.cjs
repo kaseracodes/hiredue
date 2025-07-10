@@ -2,9 +2,8 @@ const { app, BrowserWindow, Tray, Menu } = require('electron');
 const path = require('path');
 
 const log = require('./utils/logger.cjs');
-const { createIncreamentCounterJob } = require('./services/counter.service.cjs');
-const registerCounterIPC = require('./ipc/counter.ipc.cjs');
-const registerLoggerIPC = require('./ipc/logger.ipc.cjs');
+const { initScheduler } = require('./scheduler/index.cjs');
+require('./ipc/index.cjs'); 
 
 let tray = null;
 let mainWindow = null;
@@ -27,43 +26,41 @@ function createWindow() {
         }
     });
 
+    global.mainWindow = mainWindow;
+
     if (isDev) {
-        mainWindow.loadURL('http://localhost:5173');
+        global.mainWindow.loadURL('http://localhost:5173');
     } else {
         const indexPath = path.join(app.getAppPath(), 'dist', 'index.html');
         log.info('Loading production file:', indexPath);
-        mainWindow.loadFile(indexPath);
+        global.mainWindow.loadFile(indexPath);
     }
 
-    mainWindow.on('close', (e) => {
+    global.mainWindow.on('close', (e) => {
         e.preventDefault();
-        mainWindow.hide();
+        global.mainWindow.hide();
     });
 }
 
 app.whenReady().then(() => {
+    initScheduler();
     createWindow();
 
     tray = new Tray(path.join(__dirname, 'icon.png'));
     tray.setToolTip('HireDue');
     tray.setContextMenu(Menu.buildFromTemplate([
-        { label: 'Show GUI', click: () => mainWindow.show() },
+        { label: 'Show GUI', click: () => global.mainWindow.show() },
         { label: 'Quit', click: () => app.quit() }
     ]));
 
     log.info('Electron app booting...');
-
-    registerCounterIPC();
-    registerLoggerIPC();
-
-    createIncreamentCounterJob(); // Background counter update
 });
 
 app.on('second-instance', () => {
-    if (mainWindow) {
-        if (mainWindow.isMinimized()) mainWindow.restore();
-        mainWindow.show();
-        mainWindow.focus();
+    if (global.mainWindow) {
+        if (global.mainWindow.isMinimized()) global.mainWindow.restore();
+        global.mainWindow.show();
+        global.mainWindow.focus();
     } else {
         createWindow();
     }
