@@ -3,7 +3,7 @@ const log = require('../../utils/logger.cjs');
 
 module.exports = {
   name: 'counter',
-  autoStart: true,
+  autoStart: false,
   cron: '*/4 * * * * *',
   run: async () => {
     log.info('[counterTask] Running...');

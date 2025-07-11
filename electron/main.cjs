@@ -4,6 +4,8 @@ const path = require('path');
 const log = require('./utils/logger.cjs');
 const { initScheduler } = require('./scheduler/index.cjs');
 require('./ipc/index.cjs'); 
+const { launchChrome } = require('./services/chrome.service.cjs');
+const { connectAndLogTabs } = require('./services/puppeteer.service.cjs');
 
 let tray = null;
 let mainWindow = null;
@@ -54,6 +56,25 @@ app.whenReady().then(() => {
     ]));
 
     log.info('Electron app booting...');
+
+    launchChrome({ isGUI: true });
+
+    // Give Chrome some time to start
+    setTimeout(async () => {
+        try {
+            const browser =await connectAndLogTabs({ isGUI: true });
+            // const pages = await browser.pages();
+            // const page = pages.length > 0 ? pages[0] : await browser.newPage();
+
+            // Navigate to LinkedIn
+            // await page.goto('https://www.linkedin.com/uas/login?session_redirect=/sales&fromSignIn=true&trk=navigator');
+            // await page.goto('https://linkedin.com');
+            // log.info('[Puppeteer] Navigated to LinkedIn.');
+
+        } catch (err) {
+            log.error('[Main] Error connecting Puppeteer:', err);
+        }
+    }, 5000);
 });
 
 app.on('second-instance', () => {
